@@ -47,48 +47,6 @@ function afficheMedia($idMedia){
 }
 
 //fonctions pour les auteurs front
-function listAuteur2(){
-    $listAuteur = "Liste auteur(s)";
-    $sql = "SELECT 
-                `a`.`id` AS `idAuteur`, 
-                CONCAT(`a`.`nom`, ' ', `a`.`prenom`) AS `nomPrenom`, 
-                count(`m`.`id`) AS `nbMedia`
-                
-            FROM 
-                `auteur` `a` left join
-                `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
-                `media` `m` ON `am`.`idmedia` = `m`.`id`
-            GROUP BY 
-                `a`.`id`
-            ORDER BY 
-                `nom`, `prenom`";
-    $result = selectBDD($sql);
-    $nbRows = mysqli_num_rows($result);
-    $tabResult = "";
-    $tabResult .= "<table class=\"table\">";
-    $tabResult .= "<thead class=\"thead-dark\"><tr>";
-    $tabResult .= "<th>Auteur</th><th>Livre(s) lié(s)</th>";
-    $tabResult .= "</tr></thead>";
-    $tabResult .= "<tbody>";
-    if($nbRows > 0){
-        $i = 0;
-        while($i < $nbRows){
-            $row = mysqli_fetch_assoc($result);
-            $tabResult .= "<tr>";
-            $tabResult .= "<td><a href=\"auteur.php?idAuteur=" . $row["idAuteur"] . "\">" .
-            utf8_encode($row["nomPrenom"]) . "</a></td>";
-            $tabResult .= "<td>" . $row["nbMedia"] . "</td>";
-            $tabResult .= "</tr>";
-            $i++;
-        }
-    }
-    $tabResult .="</tbody>";
-    $tabResult .= "</table>";
-    $listAuteur = $tabResult;
-
-    return $listAuteur;
-}
-
 function listAuteur($bdd){
     $listAuteur = "Liste auteur(s)";
     $sql = "SELECT 

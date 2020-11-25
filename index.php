@@ -6,6 +6,8 @@ include "./functions/sql.php";
 
 //echo md5("admin");//21232f297a57a5a743894a0e4a801fc3
 
+$bdd = openConn2();
+
 ?>
 <!doctype html>
 <html>
@@ -19,11 +21,11 @@ include "./functions/sql.php";
         <section class="row">
             <article class="col-lg-6">
                 <h1>Média enregistré(s)</h1>
-                <?php echo listMedia(); ?>
+                <?php echo listMedia($bdd); ?>
             </article>
             <article class="col-lg-6">
                 <h1>Auteur(s) enregistré(s)</h1>
-                <?php echo listAuteur(); ?>
+                <?php echo listAuteur($bdd); ?>
             </article>
         </section>
     </body>

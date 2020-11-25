@@ -12,6 +12,18 @@
     return $conn;
  }
 
+ function openConn2(){
+     try {
+         $conn = new PDO("mysql:host=localhost;dbname=20200727;charset=utf8",
+             "root",
+             "", array(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION));
+         //$bdd->
+         return $conn;
+     }catch(Exception $e){
+         die("Erreur connexion : " . $e->getMessage());
+     }
+ }
+
  function closeConn($conn){
      mysqli_close($conn);
  }

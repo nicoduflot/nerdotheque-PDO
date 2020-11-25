@@ -23,7 +23,7 @@ $bdd = openConn2();
                 <?php echo listMediaBack($bdd); ?>
             </article>
             <article class="col-lg-6">
-                <?php echo listAuteurBack(); ?>
+                <?php echo listAuteurBack($bdd); ?>
             </article>
         </section>
         <!-- Modal edit media -->

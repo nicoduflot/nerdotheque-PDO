@@ -5,7 +5,6 @@
  * 
  */
 // fonctions pour les media front
-
 function listMedia($bdd){
     $sql = "SELECT `id` AS `idMedia`, `titre` AS `titreMedia` FROM `media` ORDER BY `titre`";
     $response = $bdd->prepare($sql);
@@ -102,21 +101,6 @@ function afficheAuteur($idAuteur, $bdd){
     return $response;
 }
 
-function afficheAuteur2($idAuteur){
-    $sql = "SELECT 
-                `a`.`id`, CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`bio`,
-                `m`.`titre`, `m`.`id` AS `idMedia` 
-            FROM 
-                `auteur` `a` left join
-                `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
-                `media` `m` ON `am`.`idmedia` = `m`.`id`
-            WHERE 
-                `a`.`id` = " . htmlspecialchars(addslashes($idAuteur)) .
-        " ORDER BY `m`.`titre`;";
-    $result = selectBDD($sql);
-    return $result;
-}
-
 //fonctions pour les utilisateurs
 function searchUser($idUtilisateur = ""){
     $pseudoUtilisateur = "anonyme";
@@ -161,6 +145,7 @@ function listMediaBack($bdd){
     $tabResult .="</tbody>";
     $tabResult .= "</table>";
     $listeMedia = $tabResult;
+    $response->closeCursor();
     return $listeMedia;
 }
 
@@ -241,8 +226,7 @@ function createMediaSelect(){
 }
 
 //fonctions sur les auteurs backoffice
-
-function listAuteurBack(){
+function listAuteurBack($bdd){
     $listAuteur = "Liste auteur(s)";
     $sql = "SELECT 
                 `a`.`id` AS `idAuteur`, 
@@ -257,36 +241,32 @@ function listAuteurBack(){
                 `a`.`id`
             ORDER BY 
                 `nom`, `prenom`;";
-    $result = selectBDD($sql);
-    $nbRows = mysqli_num_rows($result);
+    $response = $bdd->prepare($sql);
+    $response->execute();
+    $nbRows = $response->rowCount();
     $tabResult = "";
     $tabResult .= "<table class=\"table\">";
     $tabResult .= "<thead class=\"thead-dark\"><tr>";
     $tabResult .= "<th>Auteur</th><th>Livre(s) lié(s)</th><th colspan=\"2\">Actions</th>";
     $tabResult .= "</tr></thead>";
     $tabResult .= "<tbody>";
-    if($nbRows > 0){
-        $i = 0;
-        while($i < $nbRows){
-            $row = mysqli_fetch_assoc($result);
-            $tabResult .= "<tr>";
-            $tabResult .= "<td>" . utf8_encode($row["nomPrenom"]) . "</td>";
-            $tabResult .= "<td>" . $row["nbMedia"] . "</td>";
-            $tabResult .= "<td>";
-            $tabResult .= "<button class='btn btn-sm btn-outline-primary editAuteurButton' data-id='" . $row["idAuteur"] . "' data-toggle=\"modal\" data-target=\"#editAuteur\">";
-            $tabResult .= "Editer</button> ";
-            //$tabResult .= "<a href=\"modAuteur.php?idAuteur=" . $row["idAuteur"] . "\">Editer</a></td>";
-            $tabResult .= "<td>";
-            $tabResult .= "<a href=\"supEntite.php?entite=auteur&id=". $row["idAuteur"] ."\">Supprimer</a>";
-            $tabResult .= "</td>";
-            $tabResult .= "</tr>";
-            $i++;
-        }
+    while ($donnees = $response->fetch()) {
+        $tabResult .= "<tr>";
+        $tabResult .= "<td>" . $donnees["nomPrenom"] . "</td>";
+        $tabResult .= "<td>" . $donnees["nbMedia"] . "</td>";
+        $tabResult .= "<td>";
+        $tabResult .= "<button class='btn btn-sm btn-outline-primary editAuteurButton' data-id='" .
+            $donnees["idAuteur"] . "' data-toggle=\"modal\" data-target=\"#editAuteur\">";
+        $tabResult .= "Editer</button> ";
+        $tabResult .= "<td>";
+        $tabResult .= "<a href=\"supEntite.php?entite=auteur&id=". $donnees["idAuteur"] ."\">Supprimer</a>";
+        $tabResult .= "</td>";
+        $tabResult .= "</tr>";
     }
     $tabResult .="</tbody>";
     $tabResult .= "</table>";
     $listAuteur = $tabResult;
-
+    $response->closeCursor();
     return $listAuteur;
 }
 

@@ -5,7 +5,6 @@ include "./functions/functions.php";
 include "./functions/sql.php";
 
 $listAuteurAssoc = "";
-$bdd = openConn2();
 
 if( isset( $_GET["idMedia"] ) && $_GET["idMedia"] !== "" ){
     $idMedia = $_GET["idMedia"];

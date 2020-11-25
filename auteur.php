@@ -4,8 +4,6 @@ session_start();
 include "./functions/functions.php";
 include "./functions/sql.php";
 
-$bdd = openConn2();
-
 $listMediaAssoc = "";
 
 if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){

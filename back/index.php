@@ -7,7 +7,7 @@ if(!$_COOKIE["accesAdmin20200727"]){
     header("location: ../index.php");
     exit();
 }
-$bdd = openConn2();
+
 ?>
 <!doctype html>
 <html>

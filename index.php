@@ -3,11 +3,7 @@
 session_start();
 include "./functions/functions.php";
 include "./functions/sql.php";
-
 //echo md5("admin");//21232f297a57a5a743894a0e4a801fc3
-
-$bdd = openConn2();
-
 ?>
 <!doctype html>
 <html>

@@ -29,7 +29,6 @@
  }
 
  function selectBDD($sql){
-    //$listeMedia = "Liste Média";
     $link = openConn();
     $result = mysqli_query($link, $sql);
     closeConn($link);
@@ -50,8 +49,5 @@
     closeConn($link);
     return $messageSQL;
  }
-
- // $link = openConn();
- // $result = mysql_query($link, $sql);
-
+$bdd = openConn2();
 ?>

@@ -5,28 +5,25 @@ include "./functions/functions.php";
 include "./functions/sql.php";
 
 $listAuteurAssoc = "";
+$bdd = openConn2();
 
 if( isset( $_GET["idMedia"] ) && $_GET["idMedia"] !== "" ){
-    //$nbRows = (!$result)? 0 : mysqli_num_rows($result);
-    //return ($nbRows > 0)?mysqli_fetch_assoc($result) : ["error"=>"Pas d'enregistrement pour l'id : \"".$idMedia."\""] ;
     $idMedia = $_GET["idMedia"];
-    //$tabMedia = afficheMedia($idMedia);
-    $result = afficheMedia($idMedia);
+    $response = afficheMedia($idMedia, $bdd);
     $i = 0;
     $cptMedia = 0;
-    $nbRows = (!$result)? 0 : mysqli_num_rows($result);
+    $nbRows = $response->rowCount();
     if($nbRows === 0){
         $tabMedia = ["error"=>"Pas d'enregistrement pour l'id : \"".$idMedia."\""];
     }else{
         $listAuteurAssoc = $listAuteurAssoc . "<h2>Auteur(s) enregistré(s)</h2>";
         $listAuteurAssoc = $listAuteurAssoc . "<ul>";
         while($i < $nbRows){
-            $tabMedia = mysqli_fetch_assoc($result);
-            //var_dump($tabAuteur);
+            $tabMedia = $response->fetch();
             if($tabMedia["prenomNom"] !== NULL){
                 $listAuteurAssoc = $listAuteurAssoc . "<li>";
                 $listAuteurAssoc = $listAuteurAssoc . "<a href=\"./auteur.php?idAuteur=" . $tabMedia["idAuteur"] . "\">";
-                $listAuteurAssoc = $listAuteurAssoc . utf8_encode($tabMedia["prenomNom"]);
+                $listAuteurAssoc = $listAuteurAssoc . $tabMedia["prenomNom"];
                 $listAuteurAssoc = $listAuteurAssoc . "</a>";
                 $listAuteurAssoc = $listAuteurAssoc . "</li>";
                 $cptMedia++;
@@ -38,6 +35,7 @@ if( isset( $_GET["idMedia"] ) && $_GET["idMedia"] !== "" ){
             $listAuteurAssoc = "";
         }
     }
+    $response->closeCursor();
 }else{
     header("location: ./index.php");
     exit();
@@ -73,11 +71,6 @@ if( isset( $_GET["idMedia"] ) && $_GET["idMedia"] !== "" ){
                     <?php echo utf8_encode($tabMedia["resume"]); ?>
                     </p>
                 <?php endif ?>
-                <?php /*
-                echo "<pre>";
-                print_r($tabMedia);
-                echo "</pre>";*/
-                ?>
             </article>
         </section>
     </body>

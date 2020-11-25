@@ -7,6 +7,7 @@ if(!$_COOKIE["accesAdmin20200727"]){
     header("location: ../index.php");
     exit();
 }
+$bdd = openConn2();
 ?>
 <!doctype html>
 <html>
@@ -19,7 +20,7 @@ if(!$_COOKIE["accesAdmin20200727"]){
         <?php include "./includes/admin-menu.php"; ?>
         <section class="row">
             <article class="col-lg-6">
-                <?php echo listMediaBack(); ?>
+                <?php echo listMediaBack($bdd); ?>
             </article>
             <article class="col-lg-6">
                 <?php echo listAuteurBack(); ?>

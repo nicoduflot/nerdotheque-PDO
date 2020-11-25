@@ -4,21 +4,23 @@ session_start();
 include "./functions/functions.php";
 include "./functions/sql.php";
 
+$bdd = openConn2();
+
 $listMediaAssoc = "";
 
 if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){
     $idAuteur = $_GET["idAuteur"];
-    $result = afficheAuteur($idAuteur);
+    $response = afficheAuteur($idAuteur, $bdd);
     $i = 0;
     $cptMedia = 0;
-    $nbRows = (!$result)? 0 : mysqli_num_rows($result);
+    $nbRows = $response->rowCount();
     if($nbRows === 0){
         $tabAuteur = ["error"=>"Pas d'enregistrement pour l'id : \"".$idAuteur."\""];
     }else{
         $listMediaAssoc = $listMediaAssoc . "<h2>Livre(s) enregistré(s)</h2>";
         $listMediaAssoc = $listMediaAssoc . "<ul>";
         while($i < $nbRows){
-            $tabAuteur = mysqli_fetch_assoc($result);
+            $tabAuteur = $response->fetch();
             //var_dump($tabAuteur);
             if($tabAuteur["titre"] !== NULL){
                 $listMediaAssoc = $listMediaAssoc . "<li>";
@@ -35,6 +37,7 @@ if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){
             $listMediaAssoc = "";
         }
     }
+    $response->closeCursor();
 }else{
     header("location: ./index.php");
     exit();
@@ -67,11 +70,6 @@ if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){
                     <?php echo utf8_encode($tabAuteur["bio"]); ?>
                     </p>
                 <?php endif ?>
-                <?php /*
-                echo "<pre>";
-                print_r($tabMedia);
-                echo "</pre>";*/
-                ?>
             </article>
         </section>
     </body>

@@ -21,7 +21,7 @@ function listMedia($bdd){
         $tabResult .= "<tr>";
         $tabResult .= "<td>".
             "<a href=\"media.php?idMedia=" . $donnees["idMedia"] .
-            "\">" . utf8_encode($donnees["titreMedia"]) . "</a></td>";
+            "\">" . $donnees["titreMedia"] . "</a></td>";
         $tabResult .= "</tr>";
     }
     $tabResult .="</tbody>";
@@ -31,7 +31,7 @@ function listMedia($bdd){
     return $listeMedia;
 }
 
-function afficheMedia($idMedia){
+function afficheMedia($idMedia, $bdd){
     $sql = "SELECT
                 `m`.`id`,`m`.`utilisateur_id`, `m`.`titre`, `m`.`dateCreate`, `m`.`resume`, 
                 CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`id` AS `idAuteur`
@@ -42,8 +42,9 @@ function afficheMedia($idMedia){
                 `auteur` `a` ON `am`.`idauteur` = `a`.`id`
             WHERE 
                 `m`.`id` = " . htmlspecialchars(addslashes($idMedia)) . ";";
-    $result = selectBDD($sql);
-    return $result;
+    $response = $bdd->prepare($sql);
+    $response->execute();
+    return $response;
 }
 
 //fonctions pour les auteurs front
@@ -74,18 +75,18 @@ function listAuteur($bdd){
     while ($donnees = $response->fetch()){
         $tabResult .= "<tr>";
         $tabResult .= "<td><a href=\"auteur.php?idAuteur=" . $donnees["idAuteur"] . "\">" .
-            utf8_encode($donnees["nomPrenom"]) . "</a></td>";
+            $donnees["nomPrenom"] . "</a></td>";
         $tabResult .= "<td>" . $donnees["nbMedia"] . "</td>";
         $tabResult .= "</tr>";
     }
     $tabResult .="</tbody>";
     $tabResult .= "</table>";
     $listAuteur = $tabResult;
-
+    $response->closeCursor();
     return $listAuteur;
 }
 
-function afficheAuteur($idAuteur){
+function afficheAuteur($idAuteur, $bdd){
     $sql = "SELECT 
                 `a`.`id`, CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`bio`,
                 `m`.`titre`, `m`.`id` AS `idMedia` 
@@ -96,6 +97,22 @@ function afficheAuteur($idAuteur){
             WHERE 
                 `a`.`id` = " . htmlspecialchars(addslashes($idAuteur)) . 
             " ORDER BY `m`.`titre`;";
+    $response = $bdd->prepare($sql);
+    $response->execute();
+    return $response;
+}
+
+function afficheAuteur2($idAuteur){
+    $sql = "SELECT 
+                `a`.`id`, CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`bio`,
+                `m`.`titre`, `m`.`id` AS `idMedia` 
+            FROM 
+                `auteur` `a` left join
+                `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
+                `media` `m` ON `am`.`idmedia` = `m`.`id`
+            WHERE 
+                `a`.`id` = " . htmlspecialchars(addslashes($idAuteur)) .
+        " ORDER BY `m`.`titre`;";
     $result = selectBDD($sql);
     return $result;
 }
@@ -117,35 +134,29 @@ function searchUser($idUtilisateur = ""){
 }
 
 //fonctions sur les media backoffice
-
-function listMediaBack(){
-    $listeMedia = "Liste Média";
+function listMediaBack($bdd){
     $sql = "SELECT `id` AS `idMedia`, `titre` AS `titreMedia` FROM `media` ORDER BY `titre`";
-    $result = selectBDD($sql);
-    $nbRows = mysqli_num_rows($result);
+    $response = $bdd->prepare($sql);
+    $response->execute();
+    $nbRows = $response->rowCount();
     $tabResult = "";
     $tabResult .= "<table class=\"table\">";
     $tabResult .= "<thead class=\"thead-dark\"><tr>";
     $tabResult .= "<th>Titre</th><th colspan=\"2\">Actions</th>";
     $tabResult .= "</tr></thead>";
     $tabResult .= "<tbody>";
-    if($nbRows > 0){
-        $i = 0;
-        while($i < $nbRows){
-            $row = mysqli_fetch_assoc($result);
-            $tabResult .= "<tr>";
-            $tabResult .= "<td>" . utf8_encode($row["titreMedia"]) . "</td>";
-            $tabResult .= "<td>";
-            $tabResult .= "<button class='btn btn-sm btn-outline-primary editMediaButton' data-id='" . $row["idMedia"] . "' data-toggle=\"modal\" data-target=\"#editMedia\">";
-            $tabResult .= "Editer</button> ";
-            //$tabResult .= "<a href=\"./modMedia.php?idMedia=" . $row["idMedia"] . "\">Editer</a>";
-            $tabResult .= "</td>";
-            $tabResult .= "<td>";
-            $tabResult .= "<a href=\"supEntite.php?entite=media&id=". $row["idMedia"] ."\">Supprimer</a>";
-            $tabResult .= "</td>";
-            $tabResult .= "</tr>";
-            $i++;
-        }
+    while ($donnees = $response->fetch()) {
+        $tabResult .= "<tr>";
+        $tabResult .= "<td>" . $donnees["titreMedia"] . "</td>";
+        $tabResult .= "<td>";
+        $tabResult .= "<button class='btn btn-sm btn-outline-primary editMediaButton' data-id='" .
+            $donnees["idMedia"] . "' data-toggle=\"modal\" data-target=\"#editMedia\">";
+        $tabResult .= "Editer</button> ";
+        $tabResult .= "</td>";
+        $tabResult .= "<td>";
+        $tabResult .= "<a href=\"supEntite.php?entite=media&id=" . $donnees["idMedia"] . "\">Supprimer</a>";
+        $tabResult .= "</td>";
+        $tabResult .= "</tr>";
     }
     $tabResult .="</tbody>";
     $tabResult .= "</table>";

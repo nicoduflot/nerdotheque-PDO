@@ -1,8 +1,9 @@
 <?php
 // ici on met le code php
 session_start();
-include "../functions/functions.php";
 include "../functions/sql.php";
+include "../functions/functions.php";
+
 if(!$_COOKIE["accesAdmin20200727"]){
     header("location: ../index.php");
     exit();

@@ -8,9 +8,9 @@ if(!$_SESSION["accesAdmin20200727"]){
     exit();
 }
 $messageSQL = "";
-
 if( isset($_POST["modMedia"]) && $_POST["modMedia"] === "mod" ){
-    $messageSQL = modMedia(utf8_decode(addslashes($_POST["titre"])), utf8_decode(addslashes($_POST["resume"])), $_POST["idMedia"]);
+    $messageSQL = modMedia(utf8_decode(addslashes($_POST["titre"])), utf8_decode(addslashes($_POST["resume"])), $_POST["idMedia"]); 
+    echo $messageSQL;
 }
 
 if( isset($_GET["idMedia"]) ){

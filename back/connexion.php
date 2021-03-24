@@ -10,7 +10,7 @@ if( isset($_POST["submitConnexion"]) && $_POST["submitConnexion"] === "connexion
     $password = md5(strip_tags(addslashes($_POST["motdepasse"]) ) );
     //fonction de test de connexion en tant qu'admin
 
-    if(getAuthentication($email, $password)){
+    if(getAuthentication($email, $password, $bdd)){
         header("location: ./index.php");
     }else{
         $messageConnexion = "Problème d'identification, email ou mot de passe invalide";

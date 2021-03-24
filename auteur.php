@@ -2,6 +2,7 @@
 // ici on met le code php
 session_start();
 include "./functions/functions.php";
+include "./functions/frontFunctions.php";
 include "./functions/sql.php";
 
 $listMediaAssoc = "";
@@ -23,7 +24,7 @@ if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){
             if($tabAuteur["titre"] !== NULL){
                 $listMediaAssoc = $listMediaAssoc . "<li>";
                 $listMediaAssoc = $listMediaAssoc . "<a href=\"./media.php?idMedia=" . $tabAuteur["idMedia"] . "\">";
-                $listMediaAssoc = $listMediaAssoc . utf8_encode($tabAuteur["titre"]);
+                $listMediaAssoc = $listMediaAssoc . $tabAuteur["titre"];
                 $listMediaAssoc = $listMediaAssoc . "</a>";
                 $listMediaAssoc = $listMediaAssoc . "</li>";
                 $cptMedia++;
@@ -48,7 +49,7 @@ if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){
         <?php if(array_key_exists("error", $tabAuteur)): ?>
             <title>Médiathèque - <?php echo $tabAuteur["error"]; ?></title>
         <?php else: ?>
-            <title>Médiathèque - <?php echo utf8_encode($tabAuteur["prenomNom"]); ?></title>
+            <title>Médiathèque - <?php echo $tabAuteur["prenomNom"]; ?></title>
         <?php endif ?>
         <?php include "./includes/bootstrap.php"; ?>
     </head>
@@ -61,11 +62,11 @@ if( isset( $_GET["idAuteur"] ) && $_GET["idAuteur"] !== "" ){
                         <?php echo $tabAuteur["error"]; ?>
                     </div>
                 <?php else: ?>
-                    <h1><?php echo utf8_encode($tabAuteur["prenomNom"]); ?></h1>
+                    <h1><?php echo $tabAuteur["prenomNom"]; ?></h1>
                     <?php echo $listMediaAssoc; ?>
                     <h2>Bio :</h2>
                     <p>
-                    <?php echo utf8_encode($tabAuteur["bio"]); ?>
+                    <?php echo $tabAuteur["bio"]; ?>
                     </p>
                 <?php endif ?>
             </article>

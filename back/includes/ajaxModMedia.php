@@ -1,18 +1,19 @@
 <?php
 // ici on met le code php
 session_start();
-include "../../functions/functions.php";
 include "../../functions/sql.php";
+include "../../functions/functions.php";
 
 $messageSQL = "";
 
-//if( isset($_POST["modMedia"]) && $_POST["modMedia"] === "mod" ){
-//    echo "mechanical";
-//    $messageSQL = modMedia(utf8_decode(addslashes($_POST["titre"])), utf8_decode(addslashes($_POST["resume"])), $_POST["idMedia"]);
-//    return $messageSQL;
-//}
+$content = trim(file_get_contents("php://input"));
 
+$data = json_decode($content, true);
+$data['success'] = true;
 
+if(isset($data["modMedia"]) && $data["modMedia"] === "mod"){
+    modMedia(utf8_decode(addslashes($data["titre"])), utf8_decode(addslashes($data["resume"])), $data["idMedia"], $bdd);
+}
 
 if( isset($_GET["idMedia"]) ){
     $sql = "SELECT 
@@ -20,31 +21,27 @@ if( isset($_GET["idMedia"]) ){
             FROM 
                 `media` 
             WHERE 
-                `id` = " . $_GET["idMedia"] . ";";
-    //echo $sql;
-    $result = selectBDD($sql);
-    $nbRows = (!$result)? 0 : mysqli_num_rows($result);
+                `id` = :idMedia;";
+    $response = $bdd->prepare($sql);
+    $response->execute(array("idMedia"=>$_GET["idMedia"]));
+    $nbRows = $nbRows = $response->rowCount();
     if($nbRows > 0){
-        $row = mysqli_fetch_assoc($result);
-        //var_dump($row);
+        $donnees = $response->fetch();
         $jSonMedia = "
             {
-                \"idMedia\": ".$row['idMedia'].",
-                \"titre\": \"".utf8_encode($row['titre'])."\",
-                \"resume\": \"".utf8_encode($row['resume'])."\",
-                \"utilisateur_id\": ".$row['utilisateur_id']."
+                \"idMedia\": \"".$donnees['idMedia']."\",
+                \"titre\": \"".$donnees['titre']."\",
+                \"resume\": \"".$donnees['resume']."\",
+                \"utilisateur_id\": ".$donnees['utilisateur_id']."
             }
         ";
         echo $jSonMedia;
-        //return $row;
         return $jSonMedia;
     }else{
-        //echo "pas de data";
-        //header("location: ./index.php");
-        //exit();
         return "No data";
     }
 }else{
+    /*
     $jSonMedia = file_get_contents("php://input");
     if(strlen($jSonMedia) > 0){
         $data = json_decode($jSonMedia, true);
@@ -55,6 +52,6 @@ if( isset($_GET["idMedia"]) ){
         return $messageSQL;
     } else{
         die('Aucune données JSON.');
-    }
+    }*/
 }
 ?>

@@ -35,7 +35,7 @@
     return $result;
  }
 
- function changeBDD($sql, $table){
+  function changeBDD($sql, $table){
     $link = openConn();
     if( mysqli_query($link, $sql) ){ //si la requête a fonctionné :
         $messageSQL = "Modification la table `".$table."` : <br />" . 

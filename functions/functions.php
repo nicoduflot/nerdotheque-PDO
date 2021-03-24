@@ -1,106 +1,4 @@
 <?php
-/**
- * 
- * Page de fonctions dédiés à la formation
- * 
- */
-// fonctions pour les media front
-function listMedia($bdd){
-    $sql = "SELECT `id` AS `idMedia`, `titre` AS `titreMedia` FROM `media` ORDER BY `titre`";
-    $response = $bdd->prepare($sql);
-    $response->execute();
-    $nbRows = $response->rowCount();
-    $tabResult = "";
-    $tabResult .= "<table class=\"table\">";
-    $tabResult .= "<thead class=\"thead-dark\"><tr>";
-    $tabResult .= "<th>Titre</th>";
-    $tabResult .= "</tr></thead>";
-    $tabResult .= "<tbody>";
-    while ($donnees = $response->fetch()){
-        $tabResult .= "<tr>";
-        $tabResult .= "<td>".
-            "<a href=\"media.php?idMedia=" . $donnees["idMedia"] .
-            "\">" . $donnees["titreMedia"] . "</a></td>";
-        $tabResult .= "</tr>";
-    }
-    $tabResult .="</tbody>";
-    $tabResult .= "</table>";
-    $listeMedia = $tabResult;
-    $response->closeCursor();
-    return $listeMedia;
-}
-
-function afficheMedia($idMedia, $bdd){
-    $sql = "SELECT
-                `m`.`id`,`m`.`utilisateur_id`, `m`.`titre`, `m`.`dateCreate`, `m`.`resume`, 
-                CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`id` AS `idAuteur`
-                
-            FROM 
-                `media` `m` LEFT JOIN 
-                `auteur_media` `am` ON `m`.`id` = `am`.`idmedia` LEFT JOIN 
-                `auteur` `a` ON `am`.`idauteur` = `a`.`id`
-            WHERE 
-                `m`.`id` = " . htmlspecialchars(addslashes($idMedia)) . ";";
-    $response = $bdd->prepare($sql);
-    $response->execute();
-    return $response;
-}
-
-//fonctions pour les auteurs front
-function listAuteur($bdd){
-    $listAuteur = "Liste auteur(s)";
-    $sql = "SELECT 
-                `a`.`id` AS `idAuteur`, 
-                CONCAT(`a`.`nom`, ' ', `a`.`prenom`) AS `nomPrenom`, 
-                count(`m`.`id`) AS `nbMedia`
-                
-            FROM 
-                `auteur` `a` left join
-                `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
-                `media` `m` ON `am`.`idmedia` = `m`.`id`
-            GROUP BY 
-                `a`.`id`
-            ORDER BY 
-                `nom`, `prenom`";
-    $response = $bdd->prepare($sql);
-    $response->execute();
-    $nbRows = $response->rowCount();
-    $tabResult = "";
-    $tabResult .= "<table class=\"table\">";
-    $tabResult .= "<thead class=\"thead-dark\"><tr>";
-    $tabResult .= "<th>Auteur</th><th>Livre(s) lié(s)</th>";
-    $tabResult .= "</tr></thead>";
-    $tabResult .= "<tbody>";
-    while ($donnees = $response->fetch()){
-        $tabResult .= "<tr>";
-        $tabResult .= "<td><a href=\"auteur.php?idAuteur=" . $donnees["idAuteur"] . "\">" .
-            $donnees["nomPrenom"] . "</a></td>";
-        $tabResult .= "<td>" . $donnees["nbMedia"] . "</td>";
-        $tabResult .= "</tr>";
-    }
-    $tabResult .="</tbody>";
-    $tabResult .= "</table>";
-    $listAuteur = $tabResult;
-    $response->closeCursor();
-    return $listAuteur;
-}
-
-function afficheAuteur($idAuteur, $bdd){
-    $sql = "SELECT 
-                `a`.`id`, CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`bio`,
-                `m`.`titre`, `m`.`id` AS `idMedia` 
-            FROM 
-                `auteur` `a` left join
-                `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
-                `media` `m` ON `am`.`idmedia` = `m`.`id`
-            WHERE 
-                `a`.`id` = " . htmlspecialchars(addslashes($idAuteur)) . 
-            " ORDER BY `m`.`titre`;";
-    $response = $bdd->prepare($sql);
-    $response->execute();
-    return $response;
-}
-
 //fonctions pour les utilisateurs
 function searchUser($idUtilisateur = ""){
     $pseudoUtilisateur = "anonyme";
@@ -193,13 +91,38 @@ function addAMLink($idAuteur, $idMedia){
     }
 }
 
-function modMedia($titre, $resume, $idMedia){
+function modMedia($titre, $resume, $idMedia, $bdd){
+    /*
+    $sql = "SELECT
+                `m`.`id`,`m`.`utilisateur_id`, `m`.`titre`, `m`.`dateCreate`, `m`.`resume`, 
+                CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`id` AS `idAuteur`
+                
+            FROM 
+                `media` `m` LEFT JOIN 
+                `auteur_media` `am` ON `m`.`id` = `am`.`idmedia` LEFT JOIN 
+                `auteur` `a` ON `am`.`idauteur` = `a`.`id` " . $conditions;
+    $response = $bdd->prepare( $sql);
+    $response->execute(array( "idMedia" => htmlspecialchars( addslashes( $idMedia) ) ) );
     $sql =  "UPDATE `media` SET ".
                 "`titre` = '" . $titre ."', ".
                 "`resume` = '" . $resume . "' ".
             "WHERE `id` = " . $idMedia . ";";
-    $messageSQL = changeBDD($sql, "media");
-    return $messageSQL;
+    */
+
+    $sql =  "UPDATE `media` SET ".
+            " `titre` = :titre, ".
+            " `resume` = :resume ".
+            " WHERE `id` = :idMedia;";
+    $response = $bdd->prepare( $sql);
+    $response->execute(array( 
+        "idMedia" => htmlspecialchars( addslashes( $idMedia) ),
+        "titre" =>  htmlspecialchars( addslashes( $titre )),
+        "resume" => htmlspecialchars( addslashes( $resume ))
+        ) );
+    //var_dump($response);
+    //$messageSQL = changeBDD($sql, "media");
+    //return $messageSQL;
+    return $response;
 }
 
 function createMediaSelect(){
@@ -333,22 +256,51 @@ function deleteEntite($entite, $idEntite){
 
 //fonctions pour les utilisateurs backoffice
 
-function getAuthentication($email, $password){
+function getAuthentication($email, $password, $bdd){
+    /*
     $sql = "SELECT 
                 * 
             FROM 
                 `utilisateur` 
             WHERE 
                 `email` liKE '" . $email . 
-                "' AND `motdepasse` like '" . $password . "';";
+                "' AND `motdepasse` LIKE '" . $password . "';";
+                echo $sql;
     $result = selectBDD($sql);
     $nbRows = (!$result)? 0 : mysqli_num_rows($result);
     if($nbRows > 0){
         $idUtilisateur = mysqli_fetch_assoc($result)["id"];
+        //echo $idUtilisateur;
+        var_dump($result["nom"]);
         $nom = mysqli_fetch_assoc($result)["nom"];
         $prenom = mysqli_fetch_assoc($result)["prenom"];
         $email = mysqli_fetch_assoc($result)["email"];
         $pseudo = mysqli_fetch_assoc($result)["pseudo"];
+        return connectUser($nom, $prenom, $email, $pseudo, $idUtilisateur);
+    }else{
+        return false;
+    }*/
+
+    $sql = "SELECT 
+        * 
+    FROM 
+        `utilisateur` 
+    WHERE 
+        `email` liKE '" . $email . 
+        "' AND `motdepasse` LIKE '" . $password . "';";
+        $response = $bdd->prepare($sql);
+        $response->execute();
+        
+    $response = $bdd->prepare($sql);
+    $response->execute();
+    $nbRows = $response->rowCount();
+    if($nbRows > 0){
+        $donnees = $response->fetch();
+        $idUtilisateur = $donnees["id"];
+        $nom = $donnees["nom"];
+        $prenom = $donnees["prenom"];
+        $email = $donnees["email"];
+        $pseudo = $donnees["pseudo"];
         return connectUser($nom, $prenom, $email, $pseudo, $idUtilisateur);
     }else{
         return false;

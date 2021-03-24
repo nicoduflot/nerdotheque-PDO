@@ -2,6 +2,7 @@
 // ici on met le code php
 session_start();
 include "./functions/functions.php";
+include "./functions/frontFunctions.php";
 include "./functions/sql.php";
 
 $listAuteurAssoc = "";
@@ -12,6 +13,7 @@ if( isset( $_GET["idMedia"] ) && $_GET["idMedia"] !== "" ){
     $i = 0;
     $cptMedia = 0;
     $nbRows = $response->rowCount();
+    //var_dump($response);
     if($nbRows === 0){
         $tabMedia = ["error"=>"Pas d'enregistrement pour l'id : \"".$idMedia."\""];
     }else{
@@ -60,14 +62,14 @@ if( isset( $_GET["idMedia"] ) && $_GET["idMedia"] !== "" ){
                         <?php echo $tabMedia["error"]; ?>
                     </div>
                 <?php else: ?>
-                    <h1><?php echo utf8_encode($tabMedia["titre"]); ?></h1>
+                    <h1><?php echo $tabMedia["titre"]; ?></h1>
                     <?php echo $listAuteurAssoc; ?>
                     <p>
                         Enregistré par <?php echo searchUser($tabMedia["utilisateur_id"]); ?>
                     </p>
                     <h2>Résumé :</h2>
                     <p>
-                    <?php echo utf8_encode($tabMedia["resume"]); ?>
+                    <?php echo $tabMedia["resume"]; ?>
                     </p>
                 <?php endif ?>
             </article>

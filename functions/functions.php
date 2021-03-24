@@ -91,40 +91,6 @@ function addAMLink($idAuteur, $idMedia){
     }
 }
 
-function modMedia($titre, $resume, $idMedia, $bdd){
-    /*
-    $sql = "SELECT
-                `m`.`id`,`m`.`utilisateur_id`, `m`.`titre`, `m`.`dateCreate`, `m`.`resume`, 
-                CONCAT(`a`.`prenom`, ' ', `a`.`nom`) AS `prenomNom`, `a`.`id` AS `idAuteur`
-                
-            FROM 
-                `media` `m` LEFT JOIN 
-                `auteur_media` `am` ON `m`.`id` = `am`.`idmedia` LEFT JOIN 
-                `auteur` `a` ON `am`.`idauteur` = `a`.`id` " . $conditions;
-    $response = $bdd->prepare( $sql);
-    $response->execute(array( "idMedia" => htmlspecialchars( addslashes( $idMedia) ) ) );
-    $sql =  "UPDATE `media` SET ".
-                "`titre` = '" . $titre ."', ".
-                "`resume` = '" . $resume . "' ".
-            "WHERE `id` = " . $idMedia . ";";
-    */
-
-    $sql =  "UPDATE `media` SET ".
-            " `titre` = :titre, ".
-            " `resume` = :resume ".
-            " WHERE `id` = :idMedia;";
-    $response = $bdd->prepare( $sql);
-    $response->execute(array( 
-        "idMedia" => htmlspecialchars( addslashes( $idMedia) ),
-        "titre" =>  htmlspecialchars( addslashes( $titre )),
-        "resume" => htmlspecialchars( addslashes( $resume ))
-        ) );
-    //var_dump($response);
-    //$messageSQL = changeBDD($sql, "media");
-    //return $messageSQL;
-    return $response;
-}
-
 function createMediaSelect(){
     $sql = "SELECT * FROM `media` ORDER BY `titre`;";
     $result = selectBDD($sql);
@@ -203,14 +169,34 @@ function addAuteur($nom, $prenom, $bio){
     return $messageSQL;
 }
 
-function modAuteur($nom, $prenom, $bio, $idAuteur){
+function modMedia($titre, $resume, $idMedia, $bdd){
+    $sql =  "UPDATE `media` SET ".
+        " `titre` = :titre, ".
+        " `resume` = :resume ".
+        " WHERE `id` = :idMedia;";
+    $response = $bdd->prepare( $sql);
+    $response->execute(array(
+        "idMedia" => htmlspecialchars( addslashes( $idMedia) ),
+        "titre" =>  htmlspecialchars( addslashes( $titre )),
+        "resume" => htmlspecialchars( addslashes( $resume ))
+    ) );
+    return $response;
+}
+
+function modAuteur($nom, $prenom, $bio, $idAuteur, $bdd){
     $sql =  "UPDATE `auteur` SET ".
-                "`nom` = '" . $nom ."', ".
-                "`prenom` = '" . $prenom . "', ".
-                "`bio` = '" . $bio . "' ".
-            "WHERE `id` = " . $idAuteur . ";";
-    $messageSQL = changeBDD($sql, "auteur");
-    return $messageSQL;
+                "`nom` = :nom, ".
+                "`prenom` = :prenom, ".
+                "`bio` = :bio ".
+            "WHERE `id` = :idAuteur;";
+    $response = $bdd->prepare( $sql);
+    $response->execute(array(
+        "idAuteur" => htmlspecialchars( addslashes( $idAuteur) ),
+        "nom" =>  htmlspecialchars( addslashes( $nom )),
+        "prenom" => htmlspecialchars( addslashes( $prenom )),
+        "bio" => htmlspecialchars( addslashes( $bio ))
+    ) );
+    return $response;
 }
 
 function createAuthorSelect(){
@@ -257,30 +243,6 @@ function deleteEntite($entite, $idEntite){
 //fonctions pour les utilisateurs backoffice
 
 function getAuthentication($email, $password, $bdd){
-    /*
-    $sql = "SELECT 
-                * 
-            FROM 
-                `utilisateur` 
-            WHERE 
-                `email` liKE '" . $email . 
-                "' AND `motdepasse` LIKE '" . $password . "';";
-                echo $sql;
-    $result = selectBDD($sql);
-    $nbRows = (!$result)? 0 : mysqli_num_rows($result);
-    if($nbRows > 0){
-        $idUtilisateur = mysqli_fetch_assoc($result)["id"];
-        //echo $idUtilisateur;
-        var_dump($result["nom"]);
-        $nom = mysqli_fetch_assoc($result)["nom"];
-        $prenom = mysqli_fetch_assoc($result)["prenom"];
-        $email = mysqli_fetch_assoc($result)["email"];
-        $pseudo = mysqli_fetch_assoc($result)["pseudo"];
-        return connectUser($nom, $prenom, $email, $pseudo, $idUtilisateur);
-    }else{
-        return false;
-    }*/
-
     $sql = "SELECT 
         * 
     FROM 

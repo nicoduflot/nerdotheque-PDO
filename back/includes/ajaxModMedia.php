@@ -40,18 +40,4 @@ if( isset($_GET["idMedia"]) ){
     }else{
         return "No data";
     }
-}else{
-    /*
-    $jSonMedia = file_get_contents("php://input");
-    if(strlen($jSonMedia) > 0){
-        $data = json_decode($jSonMedia, true);
-        if (!(json_last_error() == JSON_ERROR_NONE and is_array($data))){
-            die('Données JSON invalides.');
-        }
-        $messageSQL = modAuteur(utf8_decode(addslashes($data["nom"])), utf8_decode(addslashes($data["prenom"])), utf8_decode(addslashes($data["bio"])),  $data["idAuteur"]);
-        return $messageSQL;
-    } else{
-        die('Aucune données JSON.');
-    }*/
 }
-?>

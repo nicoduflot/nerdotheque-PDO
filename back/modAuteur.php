@@ -9,8 +9,6 @@ if(!$_SESSION["accesAdmin20200727"]){
 }
 $messageSQL = "";
 
-//$sql = "SELECT `id` AS `idMedia`, `titre`, `resume` FROM `media` WHERE `id` = 4;";
-
 if( isset($_POST["modAuteur"]) && $_POST["modAuteur"] === "mod" ){
     $messageSQL = modAuteur(utf8_decode(addslashes($_POST["nom"])), utf8_decode(addslashes($_POST["prenom"])), utf8_decode(addslashes($_POST["bio"])),  $_POST["idAuteur"]);
 }
@@ -22,13 +20,11 @@ if( isset($_GET["idAuteur"]) ){
                 `auteur` 
             WHERE 
                 `id` = " . $_GET["idAuteur"] . ";";
-    //echo $sql;
     $result = selectBDD($sql);
     $nbRows = (!$result)? 0 : mysqli_num_rows($result);
     if($nbRows > 0){
         $row = mysqli_fetch_assoc($result);
     }else{
-        //echo "pas de data";
         header("location: ./index.php");
         exit();
     }

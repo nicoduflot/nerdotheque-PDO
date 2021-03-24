@@ -77,11 +77,14 @@ loaded(function(){
         console.log(JSON.stringify(parametres));
         fetch('./includes/ajaxModAuteur.php',{
             method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(parametres)
         }).then(res => {
-            //console.log("Request complete", res);
+            console.log("Request complete", res);
         }).catch(function(error){
-            //console.log("Request success", error);
+            console.log("Request success", error);
         });
         //console.log("the submit is paused until the modification is passed");
     })

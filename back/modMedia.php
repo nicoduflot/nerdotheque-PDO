@@ -20,13 +20,11 @@ if( isset($_GET["idMedia"]) ){
                 `media` 
             WHERE 
                 `id` = " . $_GET["idMedia"] . ";";
-    //echo $sql;
     $result = selectBDD($sql);
     $nbRows = (!$result)? 0 : mysqli_num_rows($result);
     if($nbRows > 0){
         $row = mysqli_fetch_assoc($result);
     }else{
-        //echo "pas de data";
         header("location: ./index.php");
         exit();
     }
